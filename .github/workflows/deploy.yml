@@ -37,15 +37,17 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
     - name: SSH to EC2 and deploy
-      uses: appleboy/ssh-action@v0.1.7
-      with:
+      env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: bestiary-repo
         IMAGE_TAG: ${{ github.sha }}
+      uses: appleboy/ssh-action@v1.0.3
+      with:
         host: ${{ secrets.EC2_HOST }}
-        username: ubuntu
+        username: bestiary
         key: ${{ secrets.EC2_DEPLOYER_SSH_KEY }}
-        all_envs: true
+        envs: ECR_REGISTRY, ECR_REPOSITORY, IMAGE_TAG
+        script_stop: true
         script: |
           echo $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG >> $GITHUB_OUTPUT
           docker compose config >> $GITHUB_OUTPUT
