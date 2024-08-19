@@ -52,6 +52,8 @@ jobs:
         migrate -path db/migrations -database "postgres://bestiary:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/bestiary?sslmode=disable" up
 
     - name: Run unit tests
+      env:
+        BESTIARY_DATABASE_URL: postgres://bestiary:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/bestiary?sslmode=disable
       run: go test ./...
 
     - name: Run integration tests
