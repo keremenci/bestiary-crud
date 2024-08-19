@@ -50,8 +50,8 @@ jobs:
       uses: addnab/docker-run-action@v3
       with:
         image: migrate/migrate
-        options: -v db/migrations:/migrations --network host -path=/migrations/ -database postgres://bestiary:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/bestiary
-        run: up
+        options: -v db/migrations:/migrations --network host
+        run: -path=/migrations/ -database postgres://bestiary:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/bestiary up
 
     - name: Run unit tests
       run: go test ./...
