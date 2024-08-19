@@ -186,6 +186,8 @@ resource "aws_instance" "app" {
               sudo mkdir -p /home/bestiary/.docker
               sudo bash -c 'echo "{\"credsStore\": \"ecr-login\"}" > /home/ubuntu/.docker/config.json'
               sudo bash -c 'echo "{\"credsStore\": \"ecr-login\"}" > /home/bestiary/.docker/config.json'
+              sudo chown -R ubuntu:ubuntu /home/ubuntu
+              sudo chown -R bestiary:bestiary /home/bestiary
               EOF
 }
 
