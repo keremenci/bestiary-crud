@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestHealthCheck tests the GET / endpoint
 func TestHealthCheck(t *testing.T) {
 	router := gin.Default()
 	router.GET("/", HealthCheck)
@@ -26,6 +27,7 @@ func TestHealthCheck(t *testing.T) {
 	assert.JSONEq(t, `{"status":"ok"}`, w.Body.String())
 }
 
+// TestListItems tests the GET /beasts endpoint
 func TestShouldListItems(t *testing.T) {
 	// Setup mock database
 
@@ -57,6 +59,7 @@ func TestShouldListItems(t *testing.T) {
 	}
 }
 
+// TestGetItem tests the GET /beasts/:key endpoint
 func TestGetItem(t *testing.T) {
 	// Setup mock database
 	mock, err := pgxmock.NewPool()
@@ -69,7 +72,6 @@ func TestGetItem(t *testing.T) {
 	rows := mock.NewRows([]string{"beast_name", "type", "cr", "attributes", "description"}).
 		AddRow("TestBeast", "TestType", "1", map[string]string{"STR": "10"}, "Test description")
 
-	// Use a regular expression to match the query with parameter placeholder
 	queryRegex := regexp.QuoteMeta("SELECT beast_name, type, cr, attributes, description FROM beasts WHERE beast_name=$1")
 	mock.ExpectQuery(queryRegex).WithArgs("TestBeast").WillReturnRows(rows)
 
@@ -110,7 +112,23 @@ func TestGetItem(t *testing.T) {
 	}
 }
 
+// TestPutItem tests the PUT /beasts endpoint
 func TestPutItem(t *testing.T) {
+	// Setup mock database
+	mock, err := pgxmock.NewPool()
+	if err != nil {
+		t.Fatalf("Unable to create mock database connection: %v", err)
+	}
+	defer mock.Close()
+	SetDBPool(mock)
+
+	// Use ExpectExec for INSERT queries
+	queryRegex := regexp.QuoteMeta("INSERT INTO beasts (beast_name, type, cr, attributes, description) VALUES ($1, $2, $3, $4, $5)")
+	mock.ExpectExec(queryRegex).
+		WithArgs("TestBeast", "TestType", "1", map[string]string{"STR": "10"}, "Test description").
+		WillReturnResult(pgxmock.NewResult("INSERT", 1))
+
+	// Setup Router
 	router := gin.Default()
 	router.POST("/beasts", PutItem)
 
@@ -128,10 +146,39 @@ func TestPutItem(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusCreated, w.Code)
+
+	// Parse the JSON response
+	var response map[string]interface{}
+	err = json.Unmarshal(w.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatalf("Failed to parse JSON response: %v", err)
+	}
+
 	// Add more assertions based on the expected JSON response
+	assert.Equal(t, "TestBeast", response["BeastName"])
+
+	// Ensure all expectations were met
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
 }
 
 func TestUpdateItem(t *testing.T) {
+	// Setup mock database
+	mock, err := pgxmock.NewPool()
+	if err != nil {
+		t.Fatalf("Unable to create mock database connection: %v", err)
+	}
+	defer mock.Close()
+	SetDBPool(mock)
+
+	// Define the expected query and arguments for the UPDATE operation
+	queryRegex := regexp.QuoteMeta("UPDATE beasts SET type=$1, cr=$2, attributes=$3, description=$4 WHERE beast_name=$5")
+	mock.ExpectExec(queryRegex).
+		WithArgs("UpdatedType", "2", map[string]string{"STR": "12"}, "Updated description", "TestBeast").
+		WillReturnResult(pgxmock.NewResult("UPDATE", 1))
+
+	// Setup router
 	router := gin.Default()
 	router.PUT("/beasts/:key", UpdateItem)
 
@@ -149,10 +196,39 @@ func TestUpdateItem(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	// Add more assertions based on the expected JSON response
+
+	// Parse the JSON response
+	var response map[string]interface{}
+	err = json.Unmarshal(w.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatalf("Failed to parse JSON response: %v", err)
+	}
+
+	// Add assertions based on the expected JSON response
+	assert.Equal(t, "Beast updated successfully", response["message"])
+
+	// Ensure all expectations were met
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
 }
 
 func TestDeleteItem(t *testing.T) {
+	// Setup mock database
+	mock, err := pgxmock.NewPool()
+	if err != nil {
+		t.Fatalf("Unable to create mock database connection: %v", err)
+	}
+	defer mock.Close()
+	SetDBPool(mock)
+
+	// Define the expected query for the DELETE operation
+	queryRegex := regexp.QuoteMeta("DELETE FROM beasts WHERE beast_name=$1")
+	mock.ExpectExec(queryRegex).
+		WithArgs("TestBeast").
+		WillReturnResult(pgxmock.NewResult("DELETE", 1))
+
+	// Setup router
 	router := gin.Default()
 	router.DELETE("/beasts/:key", DeleteItem)
 
@@ -161,5 +237,19 @@ func TestDeleteItem(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	// Add more assertions based on the expected JSON response
+
+	// Parse the JSON response
+	var response map[string]interface{}
+	err = json.Unmarshal(w.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatalf("Failed to parse JSON response: %v", err)
+	}
+
+	// Add assertions based on the expected JSON response
+	assert.Equal(t, "Beast deleted successfully", response["message"])
+
+	// Ensure all expectations were met
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
 }
