@@ -15,6 +15,24 @@ func resetAppConfig() {
 }
 
 func TestGetAppConfig(t *testing.T) {
+	// Save current environment variables
+	originalDatabaseURL := os.Getenv("BESTIARY_DATABASE_URL")
+	originalPort := os.Getenv("BESTIARY_PORT")
+
+	// Unset environment variables for the test
+	os.Unsetenv("BESTIARY_DATABASE_URL")
+	os.Unsetenv("BESTIARY_PORT")
+
+	// Restore environment variables after the test
+	defer func() {
+		if originalDatabaseURL != "" {
+			os.Setenv("BESTIARY_DATABASE_URL", originalDatabaseURL)
+		}
+		if originalPort != "" {
+			os.Setenv("BESTIARY_PORT", originalPort)
+		}
+	}()
+
 	// Setup: Create a temporary config file
 	tempDir := t.TempDir()
 	configPath := tempDir + "/config.yml"
@@ -40,9 +58,7 @@ port: "8080"`
 
 	// Test with environment variables
 	os.Setenv("BESTIARY_DATABASE_URL", "postgres://envuser:envpassword@localhost:5432/envdbname?sslmode=disable")
-	defer os.Unsetenv("BESTIARY_DATABASE_URL")
 	os.Setenv("BESTIARY_PORT", "9090")
-	defer os.Unsetenv("BESTIARY_PORT")
 
 	resetAppConfig() // Reset the config
 	config = GetAppConfig(configPath)
@@ -54,6 +70,24 @@ port: "8080"`
 }
 
 func TestGetAppConfig_InvalidPath(t *testing.T) {
+	// Save current environment variables
+	originalDatabaseURL := os.Getenv("BESTIARY_DATABASE_URL")
+	originalPort := os.Getenv("BESTIARY_PORT")
+
+	// Unset environment variables for the test
+	os.Unsetenv("BESTIARY_DATABASE_URL")
+	os.Unsetenv("BESTIARY_PORT")
+
+	// Restore environment variables after the test
+	defer func() {
+		if originalDatabaseURL != "" {
+			os.Setenv("BESTIARY_DATABASE_URL", originalDatabaseURL)
+		}
+		if originalPort != "" {
+			os.Setenv("BESTIARY_PORT", originalPort)
+		}
+	}()
+
 	// Test: Load configuration from an invalid path
 	resetAppConfig() // Reset the config
 	assert.Panics(t, func() {
@@ -62,6 +96,24 @@ func TestGetAppConfig_InvalidPath(t *testing.T) {
 }
 
 func TestGetAppConfig_InvalidYaml(t *testing.T) {
+	// Save current environment variables
+	originalDatabaseURL := os.Getenv("BESTIARY_DATABASE_URL")
+	originalPort := os.Getenv("BESTIARY_PORT")
+
+	// Unset environment variables for the test
+	os.Unsetenv("BESTIARY_DATABASE_URL")
+	os.Unsetenv("BESTIARY_PORT")
+
+	// Restore environment variables after the test
+	defer func() {
+		if originalDatabaseURL != "" {
+			os.Setenv("BESTIARY_DATABASE_URL", originalDatabaseURL)
+		}
+		if originalPort != "" {
+			os.Setenv("BESTIARY_PORT", originalPort)
+		}
+	}()
+
 	// Setup: Create a temporary config file with invalid YAML
 	tempDir := t.TempDir()
 	configPath := tempDir + "/config_invalid.yml"
