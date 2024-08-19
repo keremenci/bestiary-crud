@@ -39,6 +39,14 @@ jobs:
     - name: Install dependencies
       run: go mod download
 
+    - name: Wait for Postgres to be ready
+      run: |
+        until pg_isready -h localhost -p 5432; do
+          echo "Waiting for PostgreSQL..."
+          sleep 5
+        done
+
+
     - name: Perform migrations
       uses: vovavc/migrate-github-action@v0.2.1
       with:
