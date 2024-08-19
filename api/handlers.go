@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
@@ -26,11 +27,17 @@ var dbPool DBPool
 func InitializeDB(connString string) {
 	var err error
 	pool, err := pgxpool.New(context.Background(), connString)
-	if err != nil {
-		log.Fatalf("Unable to connect to database: %v\n", err)
+	for attempts := 0; attempts < 5; attempts++ {
+		if err == nil {
+			SetDBPool(pool)
+			log.Println("Connected to the database successfully.")
+			return
+		}
+		log.Printf("Unable to connect to database, retrying in 3 seconds... (%d/5)\n", attempts+1)
+		time.Sleep(3 * time.Second)
 	}
-	SetDBPool(pool)
-	log.Println("Connected to the database successfully.")
+
+	log.Fatalf("Unable to connect to database: %v\n", err)
 }
 
 // Function to set the dbPool variable - mostly used for testing
