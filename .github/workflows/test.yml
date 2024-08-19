@@ -18,7 +18,7 @@ jobs:
         env:
           POSTGRES_DB: bestiary
           POSTGRES_USER: bestiary
-          POSTGRES_PASSWORD: testpass
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         ports:
           - 5432:5432
         options: >-
@@ -46,18 +46,17 @@ jobs:
           sleep 5
         done
 
-
-    - name: Perform migrations
-      uses: vovavc/migrate-github-action@v0.2.1
+    - name: Perform migrations with docker
+      uses: addnab/docker-run-action@v3
       with:
-        path: ./db/migrations
-        database: postgres://bestiary:testpass@localhost:5432/bestiary?sslmode=disable
-        command: up
+        image: migrate/migrate
+        options: -v db/migrations:/migrations --network host -path=/migrations/ -database postgres://bestiary:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/bestiary
+        run: up
 
     - name: Run unit tests
       run: go test ./...
 
     - name: Run integration tests
       env:
-        BESTIARY_DATABASE_URL: postgres://bestiary:testpass@localhost:5432/bestiary?sslmode=disable
+        BESTIARY_DATABASE_URL: postgres://bestiary:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/bestiary?sslmode=disable
       run: go test ./tests/...
