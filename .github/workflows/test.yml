@@ -39,9 +39,14 @@ jobs:
     - name: Install dependencies
       run: go mod download
 
+    - name: Perform migrations
+      uses: vovavc/migrate-github-action@v0.2.1
+      with:
+        path: ./db/migrations
+        database: postgres://bestiary:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/bestiary?sslmode=disable
+        command: up
+
     - name: Run unit tests
-      env:
-        BESTIARY_DATABASE_URL: postgres://bestiary:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/bestiary?sslmode=disable
       run: go test ./...
 
     - name: Run integration tests
