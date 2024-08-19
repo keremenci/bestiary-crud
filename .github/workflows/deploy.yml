@@ -47,7 +47,7 @@ jobs:
         
     - name: SSH to EC2 and deploy
       env:
-        ECR_URL: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: bestiary-repo
         IMAGE_TAG: ${{ github.sha }}
         POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
