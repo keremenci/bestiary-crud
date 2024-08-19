@@ -43,7 +43,7 @@ jobs:
         username: bestiary
         key: ${{ secrets.EC2_DEPLOYER_SSH_KEY }}
         source: "docker-compose.yml"
-        target: "/home/bestiary/docker-compose.yml"
+        target: "/home/bestiary"
         
     - name: SSH to EC2 and deploy
       env:
