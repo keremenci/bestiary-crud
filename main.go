@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/keremenci/bestiary-crud/api"
 	"github.com/keremenci/bestiary-crud/config"
@@ -9,9 +11,9 @@ import (
 func main() {
 
 	// Load config
-	config.GetAppConfig()
+	cfg := config.GetAppConfig("config/config.yml")
 	// Init db connection
-	api.InitializeDB(config.GetAppConfig().DatabaseUrl)
+	api.InitializeDB(cfg.DatabaseUrl)
 
 	router := gin.Default()
 
@@ -22,5 +24,10 @@ func main() {
 	router.PUT("/beasts/:key", api.UpdateItem)
 	router.DELETE("/beasts/:key", api.DeleteItem)
 
-	router.Run(":8080")
+	// Use port from config, default to 8080 if not set
+	port := cfg.Port
+	if port == "" {
+		port = "8080"
+	}
+	router.Run(fmt.Sprintf(":%s", port))
 }
