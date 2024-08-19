@@ -190,9 +190,9 @@ Response:
 
 ### Code structure
 
-/api: Contains the db client and handlers for each endpoint.
-/config: Contains the config reading functions and the config files themselves in yaml format.
-/tests: Contains the unit tests for the testing stage. Has its own config.
+- /api: Contains the db client and handlers for each endpoint.
+- /config: Contains the config reading functions and the config files themselves in yaml format.
+- /tests: Contains the unit tests for the testing stage. Has its own config.
 
 ### Running for development
 
