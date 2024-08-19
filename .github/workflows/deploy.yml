@@ -58,6 +58,9 @@ jobs:
         envs: ECR_REGISTRY, ECR_REPOSITORY, IMAGE_TAG
         script_stop: true
         script: |
+          printenv
+          echo "line 2"
+          printenv
           echo $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker compose config
           docker compose down
