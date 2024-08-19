@@ -4,22 +4,21 @@ services:
     environment:
       POSTGRES_DB: bestiary
       POSTGRES_USER: bestiary
-      POSTGRES_PASSWORD: bestiarypass
-    ports:
-      - '5432:5432'
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - bestiary_network
 
   app:
-    build: .
+    image: ${ECR_URL}:${IMAGE_TAG}
     ports:
       - '8080:8080'
     depends_on:
       - postgres
     environment:
-      BESTIARY_DATABASE_URL: postgres://bestiary:bestiarypass@postgres:5432/bestiary?sslmode=disable
+      BESTIARY_DATABASE_URL: postgres://bestiary:${POSTGRES_PASSWORD}@postgres:5432/bestiary?sslmode=disable
+      GIN_MODE: release
     networks:
       - bestiary_network
 
