@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"sync"
 
@@ -36,9 +35,6 @@ func GetAppConfig(filepath string) *bestiaryConfig {
 		}
 
 		err = yaml.Unmarshal(rawConfig, &appConfig)
-		if err != nil {
-			fmt.Println("error:", err)
-		}
 		if err != nil {
 			panic(err)
 		}
