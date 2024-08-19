@@ -1,1 +1,2 @@
-db_url: ""
+db_url: "postgres://bestiary:bestiarypass@localhost:5432/bestiary?sslmode=disable"
+port: 8080
