@@ -7,20 +7,35 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+type DBPool interface {
+	Acquire(ctx context.Context) (*pgxpool.Conn, error)
+	Close()
+	Exec(ctx context.Context, sql string, arguments ...interface{}) (pgconn.CommandTag, error)
+	Query(ctx context.Context, sql string, args ...interface{}) (pgx.Rows, error)
+	QueryRow(ctx context.Context, sql string, args ...interface{}) pgx.Row
+}
+
 // Database connection pool
-var dbPool *pgxpool.Pool
+var dbPool DBPool
 
 // InitializeDB initializes the database connection pool
 func InitializeDB(connString string) {
 	var err error
-	dbPool, err = pgxpool.New(context.Background(), connString)
+	pool, err := pgxpool.New(context.Background(), connString)
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v\n", err)
 	}
+	SetDBPool(pool)
 	log.Println("Connected to the database successfully.")
+}
+
+// Function to set the dbPool variable - mostly used for testing
+func SetDBPool(pool DBPool) {
+	dbPool = pool
 }
 
 // HealthCheck endpoint
