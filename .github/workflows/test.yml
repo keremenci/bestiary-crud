@@ -1,0 +1,50 @@
+name: Go Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: bestiary
+          POSTGRES_USER: bestiary
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.20
+
+    - name: Install dependencies
+      run: go mod download
+
+    - name: Run unit tests
+      env:
+        BESTIARY_DATABASE_URL: postgres://bestiary:${{ secrets.POSTGRES_PASSWORD }}bestiarypass@localhost:5432/bestiary?sslmode=disable
+      run: go test ./...
+
+    - name: Run integration tests
+      env:
+        BESTIARY_DATABASE_URL: postgres://bestiary:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/bestiary?sslmode=disable
+      run: go test ./tests/...
