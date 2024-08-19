@@ -37,7 +37,7 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
     - name: SCP the compose yaml to EC2
-      uses: appleboy/scp-action@0.1.7
+      uses: appleboy/scp-action@v0.1.7
       with:
         host: ${{ secrets.EC2_HOST }}
         username: bestiary
