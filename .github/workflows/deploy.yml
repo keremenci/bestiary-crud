@@ -58,7 +58,7 @@ jobs:
         envs: ECR_REGISTRY, ECR_REPOSITORY, IMAGE_TAG
         script_stop: true
         script: |
-          echo $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG >> $env:GITHUB_OUTPUT
-          docker compose config >> $env:GITHUB_OUTPUT
+          echo $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker compose config
           docker compose down
           docker compose up -d
