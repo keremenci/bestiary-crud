@@ -41,7 +41,7 @@ jobs:
 
     - name: Run unit tests
       env:
-        BESTIARY_DATABASE_URL: postgres://bestiary:${{ secrets.POSTGRES_PASSWORD }}bestiarypass@localhost:5432/bestiary?sslmode=disable
+        BESTIARY_DATABASE_URL: postgres://bestiary:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/bestiary?sslmode=disable
       run: go test ./...
 
     - name: Run integration tests
