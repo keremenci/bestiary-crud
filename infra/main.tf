@@ -1,6 +1,18 @@
+terraform {
+  backend "s3" {
+    bucket = "bestiary-tfstate"
+    key    = "terraform/state.tfstate"
+    region = "eu-central-1"
+    dynamodb_table = "bestiary-tfstate-lock"
+    encrypt = true
+  }
+}
+
 provider "aws" {
   region = "eu-central-1"
 }
+
+# Networking stuff
 
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
@@ -55,6 +67,8 @@ resource "aws_security_group" "instance" {
   }
 }
 
+# Key pairs for the ec2 instance
+
 resource "aws_key_pair" "deployer" {
   key_name   = "bestiary-deployer-ed25519"
   public_key = file("./secrets/deployer_ed25519.pub")
@@ -64,6 +78,8 @@ resource "aws_key_pair" "sysadmin" {
   key_name   = "bestiary-sysadmin-ed25519"
   public_key = file("./secrets/sysadmin_ed25519.pub")
 }
+
+# EC2 instance that will run the app
 
 resource "aws_instance" "app" {
   ami                    = "ami-0e872aee57663ae2d" # Ubuntu Server 24.04 LTS
@@ -115,10 +131,30 @@ resource "aws_instance" "app" {
               EOF
 }
 
+# Elastic IP
+
 resource "aws_eip" "app_ip" {
   instance = aws_instance.app.id
 }
 
+# Instance IP
+
 output "instance_ip" {
   value = aws_eip.app_ip.public_ip
+}
+
+resource "aws_ecr_repository" "bestiary_repo" {
+  name = "bestiary-repo"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = {
+    Name = "bestiary-repo"
+  }
+}
+
+output "ecr_repository_url" {
+  value = aws_ecr_repository.bestiary_repo.repository_url
 }
