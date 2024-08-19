@@ -56,7 +56,7 @@ jobs:
         host: ${{ secrets.EC2_HOST }}
         username: bestiary
         key: ${{ secrets.EC2_DEPLOYER_SSH_KEY }}
-        envs: ECR_REGISTRY, ECR_REPOSITORY, IMAGE_TAG, POSTRES_PASSWORD
+        envs: ECR_REGISTRY, ECR_REPOSITORY, IMAGE_TAG, POSTGRES_PASSWORD
         script_stop: true
         script: |
           export ECR_URL=$ECR_REGISTRY/$ECR_REPOSITORY
