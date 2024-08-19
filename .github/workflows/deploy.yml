@@ -47,9 +47,10 @@ jobs:
         
     - name: SSH to EC2 and deploy
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_URL: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: bestiary-repo
         IMAGE_TAG: ${{ github.sha }}
+        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.EC2_HOST }}
@@ -58,10 +59,7 @@ jobs:
         envs: ECR_REGISTRY, ECR_REPOSITORY, IMAGE_TAG
         script_stop: true
         script: |
-          printenv
-          echo "line 2"
-          printenv
-          echo $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          export ECR_URL=$ECR_REGISTRY/$ECR_REPOSITORY
           docker compose config
           docker compose down
           docker compose up -d
