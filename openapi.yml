@@ -1,0 +1,159 @@
+openapi: 3.1.0
+info:
+  title: Bestiary-CRUD API
+  version: 1.0.0
+  description: API for managing beasts in DnD 5e
+
+paths:
+  /:
+    get:
+      summary: Health check
+      description: Returns the status of the API.
+      responses:
+        '200':
+          description: API is running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  /beasts:
+    get:
+      summary: Get all beasts
+      description: Returns a list of all beasts in the database.
+      responses:
+        '200':
+          description: A list of beasts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Beast'
+
+    post:
+      summary: Add a new beast
+      description: Adds a new beast to the database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Beast'
+      responses:
+        '201':
+          description: Beast created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  BeastName:
+                    type: string
+                    example: Mimic
+
+  /beasts/{key}:
+    get:
+      summary: Get a beast by key
+      description: Returns a beast by its key.
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The key of the beast to retrieve
+      responses:
+        '200':
+          description: A single beast
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Beast'
+
+    put:
+      summary: Update a beast
+      description: Updates an existing beast by its key.
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The key of the beast to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Beast'
+      responses:
+        '200':
+          description: Beast updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Beast 'Mimic' updated successfully.
+
+    delete:
+      summary: Delete a beast
+      description: Deletes a beast by its key.
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The key of the beast to delete
+      responses:
+        '200':
+          description: Beast deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Beast 'Mimic' deleted successfully.
+
+components:
+  schemas:
+    Beast:
+      type: object
+      properties:
+        BeastName:
+          type: string
+          example: Mimic
+        Type:
+          type: string
+          example: Monstrosity(Shapechanger)
+        CR:
+          type: string
+          example: "2"
+        Attributes:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            CHA: "8 (-1)"
+            CON: "15 (+2)"
+            DEX: "12 (+1)"
+            INT: "5 (-3)"
+            STR: "17 (+3)"
+            WIS: "13 (+1)"
+        Description:
+          type: string
+          example: >
+            Shapechanger. The mimic can use its action to polymorph into an object or back into its true, amorphous form. Its statistics are the same in each form. Any equipment it is wearing or carrying isn't transformed. It reverts to its true form if it dies.
+            Grappler. The mimic has advantage on attack rolls against any creature grappled by it.
+            Adhesive (Object Form Only). The mimic adheres to anything that touches it. A Huge or smaller creature adhered to the mimic is also grappled by it (escape DC 13). Ability checks made to escape this grapple have disadvantage.
+            False Appearance (Object Form Only). While the mimic remains motionless, it is indistinguishable from an ordinary object.
