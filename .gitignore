@@ -26,3 +26,12 @@ go.work.sum
 
 # Locals
 local/
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+
+.terraform/
+.terraform*
+
+infra/secrets/
