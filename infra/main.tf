@@ -128,6 +128,10 @@ resource "aws_instance" "app" {
 
               sudo chmod 600 /home/bestiary/.ssh/authorized_keys
               sudo chown -R bestiary:bestiary /home/bestiary
+
+              # Set up nginx
+              sudo apt-get -qq --yes --force-yes install nginx
+              sudo systemctl enable --now nginx.service
               EOF
 }
 
