@@ -9,6 +9,10 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+
     env:
       IMAGE_NAME: ghcr.io/keremenci/bestiary-crud-api
       IMAGE_TAG: ${{ github.sha }}
