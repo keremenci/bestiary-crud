@@ -103,11 +103,22 @@ func PutItem(c *gin.Context) {
 		return
 	}
 
-	_, err := dbPool.Exec(context.Background(), "INSERT INTO beasts (beast_name, type, cr, attributes, description) VALUES ($1, $2, $3, $4, $5)",
+	// Use ON CONFLICT DO NOTHING to handle duplicate primary keys
+	cmdTag, err := dbPool.Exec(context.Background(), `
+		INSERT INTO beasts (beast_name, type, cr, attributes, description) 
+		VALUES ($1, $2, $3, $4, $5)
+		ON CONFLICT (beast_name) DO NOTHING`,
 		beast.BeastName, beast.Type, beast.CR, beast.Attributes, beast.Description)
+
 	if err != nil {
 		log.Printf("Error inserting into database: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	// Check if the insert was successful
+	if cmdTag.RowsAffected() == 0 {
+		c.JSON(http.StatusConflict, gin.H{"error": "Beast already exists"})
 		return
 	}
 

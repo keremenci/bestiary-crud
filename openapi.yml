@@ -55,6 +55,16 @@ paths:
                   BeastName:
                     type: string
                     example: Mimic
+        '409':
+          description: Beast already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Beast already exists
 
   /beasts/{key}:
     get:
