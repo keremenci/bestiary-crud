@@ -3,5 +3,5 @@ DELETE FROM beasts WHERE beast_name IN (
     'Mimic',
     'Elder Brain',
     'Mind Flayer',
-    'Displacer Beast',
+    'Displacer Beast'
 );
