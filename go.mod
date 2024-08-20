@@ -3,6 +3,7 @@ module github.com/keremenci/bestiary-crud
 go 1.23.0
 
 require (
+	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-gonic/gin v1.10.0
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/pashagolub/pgxmock/v4 v4.2.0

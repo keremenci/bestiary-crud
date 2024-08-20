@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/keremenci/bestiary-crud/api"
 	"github.com/keremenci/bestiary-crud/config"
@@ -16,6 +17,13 @@ func main() {
 	api.InitializeDB(cfg.DatabaseUrl)
 
 	router := gin.Default()
+
+	// Configure CORS to allow all origins TODO: tie this to an env variable
+	router.Use(cors.New(cors.Config{
+		AllowAllOrigins: true,
+		AllowMethods:    []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:    []string{"Origin", "Content-Type", "Accept"},
+	}))
 
 	router.GET("/", api.HealthCheck)
 	router.GET("/beasts", api.ListItems)
