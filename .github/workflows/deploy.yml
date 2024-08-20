@@ -56,6 +56,9 @@ jobs:
         envs: IMAGE_NAME, IMAGE_TAG, POSTGRES_PASSWORD
         script_stop: true
         script: |
+          echo "IMAGE_NAME=$IMAGE_NAME" > .env
+          echo "IMAGE_TAG=$IMAGE_TAG" > .env
+          echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" > .env
           docker compose config
           docker compose down
           docker compose up -d
