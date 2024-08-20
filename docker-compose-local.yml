@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: bestiary
+      POSTGRES_USER: bestiary
+      POSTGRES_PASSWORD: temppass
+    #volumes:
+    #  - /tmp/postgres_data:/var/lib/postgresql/data
+    networks:
+      - bestiary_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bestiary"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    ports:
+      - '8080:8080'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      BESTIARY_DATABASE_URL: postgres://bestiary:temppass@postgres:5432/bestiary?sslmode=disable
+      GIN_MODE: release
+    networks:
+      - bestiary_network
+
+volumes:
+  postgres_data:
+
+networks:
+  bestiary_network:
+    driver: bridge
