@@ -114,7 +114,7 @@ resource "aws_instance" "app" {
               sudo systemctl enable containerd.service
               sudo groupadd docker
 
-              # Create user, password generated with python3 crypt
+              # Create user
               sudo useradd -m -s /bin/bash -U -G sudo,docker,adm,dip,lxd,cdrom bestiary
               sudo mkdir -p /home/bestiary/.ssh
               sudo chmod 700 /home/bestiary/.ssh
