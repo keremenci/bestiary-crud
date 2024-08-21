@@ -132,6 +132,9 @@ resource "aws_instance" "app" {
               # Set up nginx
               sudo apt-get -qq --yes --force-yes install nginx
               sudo systemctl enable --now nginx.service
+
+              # Add cloudflare certs folder
+              mkdir -p /root/cloudflare-certs
               EOF
 }
 
