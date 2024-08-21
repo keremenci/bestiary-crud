@@ -56,6 +56,7 @@ jobs:
         envs: IMAGE_NAME, IMAGE_TAG, POSTGRES_PASSWORD
         script_stop: true
         script: |
+          mkdir -p api
           docker network create bestiary_network || true
           echo "IMAGE_NAME=$IMAGE_NAME" > api/.env
           echo "IMAGE_TAG=$IMAGE_TAG" >> api/.env
